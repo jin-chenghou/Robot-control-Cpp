@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Robot-Arm</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <style>
+            body {
+                background-color: #f1f1f1;
+            }
+    
+            .container {
+                margin-top: 10px;
+            }
+    
+            /* .progress-bar {
+                background-color: #fff;
+                padding: 10px;
+                border-radius: 5px;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                margin-bottom: 10px;
+            } */
+    
+            /* h1 {
+                text-align: center;
+                margin-bottom: 10px;
+                color: #444;
+            }
+    
+            h3 {
+                color: #333;
+            } */
+    
+            * {
+            box-sizing: border-box;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            }
+    
+            header, footer {
+            color: #FFF;
+            padding: 7px;
+            opacity: 0.5;
+            }
+    
+            header {
+            background-color: #99c2db;
+            opacity: 0.7;
+            font-weight: 100;
+            }
+    
+            section {
+                margin-top: 3%;
+                color: #73c1ca;
+            }
+    
+            footer {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                background-color: #99c2db;
+                opacity: 0.5;
+            }
+    
+            /* button{
+                    background-color:#6ca6a6;
+                    color:white;
+                    width: 220px;
+                    height: 70px;
+                    border:5;
+                    font-weight: 200;
+                    font-size: 20px;
+                    font-family:Georgia, 'Times New Roman', Times, serif;
+                    box-sizing: content-box;				
+                    border-radius: 10%;
+                    size: 10px;
+                }
+                button:hover{
+                    background-color: #70cfed;
+                } */
+    
+            video{
+                position: fixed;
+                right:0;
+                bottom: 0;
+                min-width: 100%;
+                min-height: 100%;
+                width: auto;
+                height: auto;
+                z-index: -9999;
+            }
+    
+            .joint-control {
+                -webkit-appearance: none;
+                height: 5px;
+                width: 5px;
+                border-radius: 5px;
+                background: #f1f1f1;
+                outline: none;
+                opacity: 0.7;
+                transition: opacity 0.2s;
+            }
+    
+            .joint-control::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background-color: #4caf50;
+                cursor: pointer;
+            }
+    
+            .joint-control::-moz-range-thumb {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background-color: #4caf50;
+                cursor: pointer;
+            }
+        </style>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Robot-Arm Experiment Platform</h1>
+
+            <div class="row">
+                <div class="col s12 m6">
+                    <div class="progress-bar">
+                        <h4>Robot-arm rotation degree 5</h4>
+                        <input type="range" id="joint1" min="0" max="255"
+                            value="00" class="joint-control" data-joint="1">
+                    </div>
+                </div>
+
+                <div class="col s12 m6">
+                    <div class="progress-bar">
+                        <h4>Robot-arm rotation degree 2</h4>
+                        <input type="range" id="joint2" min="0" max="255"
+                            value="80" class="joint-control" data-joint="2">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12 m6">
+                    <div class="progress-bar">
+                        <h4>Robot-arm rotation degree 3</h4>
+                        <input type="range" id="joint3" min="0" max="255"
+                            value="80" class="joint-control" data-joint="3">
+                    </div>
+                </div>
+
+                <div class="col s12 m6">
+                    <div class="progress-bar">
+                        <h4>Robot-arm rotation degree 4</h4>
+                        <input type="range" id="joint4" min="0" max="255"
+                            value="80" class="joint-control" data-joint="4">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12 m6">
+                    <div class="progress-bar">
+                        <h4>Robot-arm rotation degree 5</h4>
+                        <input type="range" id="joint5" min="0" max="255"
+                            value="134" class="joint-control" data-joint="5">
+                    </div>
+                </div>
+
+                <div class="col s12 m6">
+                    <div class="progress-bar">
+                        <h4>Robot-Arm Demo Action</h4>
+                        <button id="preset-action-btn" class="btn">START</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+        <script>
+        var presetActionButton = document.getElementById('preset-action-btn');
+		// 创建 QWebChannel 对象
+        var webChannel = new QWebChannel(qt.webChannelTransport, function(channel) {
+		// 获取 Bridge 对象
+		var bridge = channel.objects.bridge;
+		// 向服务器发送数据
+		 presetActionButton.addEventListener('click', function() {
+			// 向服务器发送预设动作指令
+			bridge.onButtonClicked();
+			 });
+			document.getElementById("joint1").addEventListener("input", sendSliderValues);
+			document.getElementById("joint2").addEventListener("input", sendSliderValues);
+			document.getElementById("joint3").addEventListener("input", sendSliderValues);
+			document.getElementById("joint4").addEventListener("input", sendSliderValues);
+			document.getElementById("joint5").addEventListener("input", sendSliderValues);
+			// 发送滑块值给 Qt
+			function sendSliderValues() {
+				var slider1 = document.getElementById("joint1").value;
+				var slider2 = document.getElementById("joint2").value;
+				var slider3 = document.getElementById("joint3").value;
+				var slider4 = document.getElementById("joint4").value;
+				var slider5 = document.getElementById("joint5").value;
+
+				bridge.onSliderValueChanged(slider1, slider2, slider3, slider4, slider5);
+			}
+		});
+    </script>
+    </body>
+</html>
